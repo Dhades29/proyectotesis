@@ -1,6 +1,6 @@
 @extends('layouts.menu')
 
-@section('title', 'Dashboard')
+@section('title', 'Respuestas')
 
 @section('content')
     <div class="container">

@@ -40,17 +40,17 @@
             @if(session('error'))
                 <div class="alert alert-danger">{{ session('error') }}</div>
             @endif
-            <form action="" method="POST">
+            <form action="{{ route('login.post') }}" method="POST">
                 @csrf
 
                 <div class="mb-3">
-                    <label for="email" class="form-label">Usuario</label>
-                    <input type="email" name="email" class="form-control" required autofocus>
+                    <label for="usuario" class="form-label">Usuario</label>
+                    <input type="text" name="usuario" class="form-control" autofocus>
                 </div>
 
                 <div class="mb-3">
                     <label for="password" class="form-label">Contraseña</label>
-                    <input type="password" name="password" class="form-control" required>
+                    <input type="password" name="password" class="form-control">
                 </div>
 
                 <div class="d-grid gap-2">

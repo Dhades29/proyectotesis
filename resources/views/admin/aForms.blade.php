@@ -30,19 +30,18 @@
                             <input type="text" class="form-control" id="nombreFormulario" name="nombreFormulario" required>
                         </div>
 
-                        <!-- Botón para agregar pregunta -->
+                        <!-- Botón para agregar sección -->
                         <div class="mb-3">
-                            <button type="button" class="btn btn-outline-primary" id="btnAgregarPregunta">
-                                <i class="fa fa-plus-circle"></i> Agregar Pregunta
+                            <button type="button" class="btn btn-outline-success" id="btnAgregarSeccion">
+                                <i class="fa fa-plus-circle"></i> Agregar Sección
                             </button>
                         </div>
 
-                        <!-- Contenedor de preguntas -->
-                        <div id="contenedorPreguntas" class="d-flex flex-column gap-3">
-                            <!-- Las preguntas se agregarán dinámicamente aquí -->
+                        <!-- Contenedor de secciones -->
+                        <div id="contenedorSecciones" class="d-flex flex-column gap-4">
+                            <!-- Secciones con sus preguntas se agregarán aquí -->
                         </div>
                     </div>
-
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" id="btnCancelarFormulario" data-bs-dismiss="modal">
                             <i class="fa fa-times-circle"></i> Cancelar
@@ -162,20 +161,47 @@
 
 
 <script>
-    const formCrear = document.getElementById('formularioCrear');
-    const contenedorPreguntas = document.getElementById('contenedorPreguntas');
-    const btnAgregarPregunta = document.getElementById('btnAgregarPregunta');
+    let contadorSecciones = 0;
 
-    btnAgregarPregunta.addEventListener('click', function () {
+    const contenedorSecciones = document.getElementById('contenedorSecciones');
+    const btnAgregarSeccion = document.getElementById('btnAgregarSeccion');
+
+    btnAgregarSeccion.addEventListener('click', function () {
+        contadorSecciones++;
+        const idSeccion = `seccion-${contadorSecciones}`;
+
+        const seccionHTML = `
+            <div class="card border border-success p-3" id="${idSeccion}">
+                <div class="mb-3">
+                    <label class="form-label">Nombre de la Sección</label>
+                    <input type="text" name="secciones[${contadorSecciones}][titulo]" class="form-control" required placeholder="Ej: Infraestructura Tecnológica del Usuario">
+                </div>
+                
+                <!-- Contenedor de preguntas de esta sección -->
+                <div class="preguntas-container d-flex flex-column gap-3" id="preguntas-${contadorSecciones}"></div>
+
+                <!-- Botón para agregar pregunta a esta sección -->
+                <button type="button" class="btn btn-outline-primary mt-3" onclick="agregarPregunta(${contadorSecciones})">
+                    <i class="fa fa-plus"></i> Agregar Pregunta
+                </button>
+            </div>
+        `;
+        contenedorSecciones.insertAdjacentHTML('beforeend', seccionHTML);
+    });
+
+    function agregarPregunta(seccionId) {
+        const contenedorPreguntas = document.getElementById(`preguntas-${seccionId}`);
+        const indexPregunta = contenedorPreguntas.childElementCount;
+
         const preguntaHTML = `
-            <div class="card border border-primary p-3">
+            <div class="card p-3 border border-primary">
                 <div class="mb-2">
                     <label class="form-label">Pregunta</label>
-                    <input type="text" name="preguntas[]" class="form-control" placeholder="Escribe la pregunta..." required>
+                    <input type="text" name="secciones[${seccionId}][preguntas][${indexPregunta}][texto]" class="form-control" required placeholder="Ej: ¿Los estudiantes tienen acceso...?">
                 </div>
                 <div class="mb-2">
                     <label class="form-label">Tipo de Respuesta</label>
-                    <select name="tipos[]" class="form-select">
+                    <select name="secciones[${seccionId}][preguntas][${indexPregunta}][tipo]" class="form-select">
                         <option value="texto">Texto</option>
                         <option value="seleccion">Selección Múltiple</option>
                         <option value="booleano">Sí / No</option>
@@ -184,23 +210,105 @@
             </div>
         `;
         contenedorPreguntas.insertAdjacentHTML('beforeend', preguntaHTML);
-    });
+    }
 
-    // Limpiar el formulario al cerrar o cancelar el modal
+    function agregarPregunta(seccionId) {
+        const contenedorPreguntas = document.getElementById(`preguntas-${seccionId}`);
+        const indexPregunta = contenedorPreguntas.childElementCount;
+
+        const preguntaId = `seccion${seccionId}_pregunta${indexPregunta}`;
+        const preguntaHTML = `
+            <div class="card p-3 border border-primary" id="${preguntaId}">
+                <div class="mb-2">
+                    <label class="form-label">Pregunta</label>
+                    <input type="text" name="secciones[${seccionId}][preguntas][${indexPregunta}][texto]" class="form-control" required placeholder="Ej: ¿Los estudiantes tienen acceso...?">
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label">Tipo de Respuesta</label>
+                    <select name="secciones[${seccionId}][preguntas][${indexPregunta}][tipo]" class="form-select" 
+                        onchange="actualizarTipoRespuesta(${seccionId}, ${indexPregunta}, this.value)">
+                        <option value="">-- Seleccionar tipo --</option>
+                        <option value="texto">Texto</option>
+                        <option value="seleccion">Selección Única</option>
+                        <option value="multiple">Selección Múltiple</option>
+                        <option value="booleano">Sí / No</option>
+                    </select>
+                </div>
+
+                <div class="tipo-respuesta mt-3" id="respuesta-${seccionId}-${indexPregunta}">
+                    <!-- Aquí se mostrará la UI de tipo de respuesta -->
+                </div>
+            </div>
+        `;
+
+        contenedorPreguntas.insertAdjacentHTML('beforeend', preguntaHTML);
+    }
+
+    function actualizarTipoRespuesta(seccionId, preguntaId, tipo) {
+        const contenedorRespuesta = document.getElementById(`respuesta-${seccionId}-${preguntaId}`);
+        contenedorRespuesta.innerHTML = ''; // Limpiar contenido previo
+
+        if (tipo === 'texto') {
+            contenedorRespuesta.innerHTML = `
+                <label class="form-label">Vista de Respuesta</label>
+                <input type="text" class="form-control" disabled placeholder="Respuesta de texto...">
+            `;
+        } else if (tipo === 'booleano') {
+            contenedorRespuesta.innerHTML = `
+                <label class="form-label">Opciones (no editables)</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" disabled>
+                    <label class="form-check-label">Sí</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" disabled>
+                    <label class="form-check-label">No</label>
+                </div>
+            `;
+        } else if (tipo === 'seleccion' || tipo === 'multiple') {
+            const tipoInput = tipo === 'seleccion' ? 'radio' : 'checkbox';
+            contenedorRespuesta.innerHTML = `
+                <label class="form-label">Opciones</label>
+                <div id="opciones-${seccionId}-${preguntaId}" class="mb-2 d-flex flex-column gap-2"></div>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="agregarOpcion(${seccionId}, ${preguntaId}, '${tipoInput}')">
+                    <i class="fa fa-plus-circle"></i> Agregar Opción
+                </button>
+            `;
+            agregarOpcion(seccionId, preguntaId, tipoInput); // Añadir una opción por defecto
+        }
+    }
+
+    function agregarOpcion(seccionId, preguntaId, tipoInput) {
+        const contenedorOpciones = document.getElementById(`opciones-${seccionId}-${preguntaId}`);
+        const indexOpcion = contenedorOpciones.childElementCount;
+
+        const opcionHTML = `
+            <div class="input-group">
+                <div class="input-group-text">
+                    <input type="${tipoInput}" disabled>
+                </div>
+                <input type="text" name="secciones[${seccionId}][preguntas][${preguntaId}][opciones][${indexOpcion}]" class="form-control" placeholder="Opción ${indexOpcion + 1}" required>
+                <button class="btn btn-outline-danger" type="button" onclick="this.closest('.input-group').remove()">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </div>
+        `;
+        contenedorOpciones.insertAdjacentHTML('beforeend', opcionHTML);
+    }
+
+
+    // Función para limpiar el formulario
+    const formCrear = document.getElementById('formularioCrear');
     const limpiarModalFormulario = () => {
         formCrear.reset();
-        contenedorPreguntas.innerHTML = '';
+        contenedorSecciones.innerHTML = '';
+        contadorSecciones = 0;
     };
 
-    // Al cerrar con la X
     document.getElementById('btnCerrarModal').addEventListener('click', limpiarModalFormulario);
-
-    // Al hacer clic en "Cancelar"
     document.getElementById('btnCancelarFormulario').addEventListener('click', limpiarModalFormulario);
-
-    // También puedes limpiar cuando se cierra el modal (extra seguridad)
-    const modal = document.getElementById('modalNuevoFormulario');
-    modal.addEventListener('hidden.bs.modal', limpiarModalFormulario);
+    document.getElementById('modalNuevoFormulario').addEventListener('hidden.bs.modal', limpiarModalFormulario);
 </script>
 
 @endsection

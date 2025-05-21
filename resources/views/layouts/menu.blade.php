@@ -148,20 +148,20 @@
 
     <div class="sidebar hidden" id="sidebar">
 
-    <div class="sidebar-header text-center p-3">
-        <img src="https://play-lh.googleusercontent.com/hZmdwiFSH5zYkiFjxeBrlZtNeHMN0y3EsVJomKt2hkVJu6H98ZWzfVJFxIoUaQXdpqw=w600-h300-pc0xffffff-pd" alt="Logo" class="img-fluid rounded-circle mb-2">
-        <h5 class="mb-0">Administrador</h5>
-    </div>
+        <div class="sidebar-header text-center p-3">
+            <img src="https://play-lh.googleusercontent.com/hZmdwiFSH5zYkiFjxeBrlZtNeHMN0y3EsVJomKt2hkVJu6H98ZWzfVJFxIoUaQXdpqw=w600-h300-pc0xffffff-pd" alt="Logo" class="img-fluid rounded-circle mb-2">
+            <h5 class="mb-0">Administrador</h5>
+        </div>
 
-        <a href="{{ route('dashboard') }}"><i class="fa-solid fa-house"></i> Dashboard</a>
+        <a href="{{ route('admin.dashboard') }}"><i class="fa-solid fa-house"></i> Dashboard</a>
 
         <button class="dropdown-btn">
             <i class="fa-solid fa-tools"></i> Mantenimientos
             <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-container">
-            <a href="{{ route('usuarios') }}"><i class="fa-solid fa-users"></i> Gestión de Usuarios</a>
-            <a href="{{ route('materias') }}"><i class="fa-solid fa-book"></i> Gestión de Materias</a>
+            <a href="{{ route('admin.usuarios') }}"><i class="fa-solid fa-users"></i> Gestión de Usuarios</a>
+            <a href="{{ route('admin.materias') }}"><i class="fa-solid fa-book"></i> Gestión de Materias</a>
         </div>
 
         <button class="dropdown-btn">
@@ -169,13 +169,13 @@
             <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-container">
-            <a href="{{ route('CrearFormulario') }}"><i class="fa-solid fa-plus"></i> Crear formulario</a>
-            <a href="{{ route('AsignarFormulario') }}"><i class="fa-solid fa-user-check"></i> Asignar formulario</a>
-            <a href="{{ route('respuestas') }}"><i class="fa-solid fa-reply"></i> Respuestas</a>
+            <a href="{{ route('admin.CrearFormulario') }}"><i class="fa-solid fa-plus"></i> Crear formulario</a>
+            <a href="{{ route('admin.AsignarFormulario') }}"><i class="fa-solid fa-user-check"></i> Asignar formulario</a>
+            <a href="{{ route('admin.respuestas') }}"><i class="fa-solid fa-reply"></i> Respuestas</a>
         </div>
-        <a href="#"><i class="fa-solid fa-chart-bar"></i> Reportes</a>
 
-        <a href="/"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
+        <a href="#"><i class="fa-solid fa-chart-bar"></i> Reportes</a>
+        <a href="{{ route('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
     </div>
 
     <!-- efecto de menu-->
