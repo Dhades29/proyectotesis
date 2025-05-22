@@ -117,7 +117,7 @@
 <!-- Modal para nuevo formulario -->
 <div class="modal fade" id="modalNuevoFormulario" tabindex="-1" aria-labelledby="modalNuevoFormularioLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <form id="formularioCrear" method="POST" action="#">
+        <form method="POST" action="{{ route('formularios.store') }}">
             @csrf
             <div class="modal-content">
                 <div class="modal-header">
@@ -152,6 +152,7 @@
                     <button type="submit" class="btn btn-primary">
                         <i class="fa fa-save"></i> Guardar Formulario
                     </button>
+                    
                 </div>
             </div>
         </form>

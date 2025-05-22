@@ -37,6 +37,7 @@ class UsuariosController extends Controller
         ];
 
         try {
+            
             Usuarios::create([
                 'Nombre' => $request->nombre,
                 'Apellido' => $request->apellido,

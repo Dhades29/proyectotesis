@@ -169,8 +169,8 @@
             <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-container">
-            <a href="{{ route('admin.CrearFormulario') }}"><i class="fa-solid fa-plus"></i> Crear formulario</a>
-            <a href="{{ route('admin.AsignarFormulario') }}"><i class="fa-solid fa-user-check"></i> Asignar formulario</a>
+            <a href=""><i class="fa-solid fa-plus"></i> Crear formulario</a>
+            <a href=""><i class="fa-solid fa-user-check"></i> Asignar formulario</a>
             <a href="{{ route('admin.respuestas') }}"><i class="fa-solid fa-reply"></i> Respuestas</a>
         </div>
 
