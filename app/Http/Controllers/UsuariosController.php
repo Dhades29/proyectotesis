@@ -57,35 +57,28 @@ class UsuariosController extends Controller
     public function editar(Request $request, $id){
         
         $request->validate([
-            'nombre' => 'required|string|max:50',
-            'apellido' => 'required|string|max:50',
-            'username' => 'required|string|max:50|unique:usuarios,NombreUsuario,' . $id . ',IdUsuario',
-            'rol' => 'required|in:administrador,observador',
-            'password' => 'nullable|string|min:6',
+            'nombre'    => 'required|string|max:255',
+            'apellido'  => 'required|string|max:255',
+            'username'  => 'required|string|max:255|unique:usuarios,NombreUsuario,' . $id . ',IdUsuario',
+            'rol'       => 'required|in:administrador,observador',
+            'password'  => 'nullable|string|min:6',
         ]);
 
-        $rolMap = [
-            'administrador' => 1,
-            'observador' => 2,
-        ];
+        $usuario = Usuarios::findOrFail($id);
 
-        try {
-            $usuario = Usuarios::findOrFail($id);
-            $usuario->Nombre = $request->nombre;
-            $usuario->Apellido = $request->apellido;
-            $usuario->NombreUsuario = $request->username;
-            $usuario->IdRol = $rolMap[$request->rol];
+        $usuario->Nombre = $request->nombre;
+        $usuario->Apellido = $request->apellido;
+        $usuario->NombreUsuario = $request->username;
+        $usuario->IdRol = $request->rol === 'administrador' ? 1 : 2;
 
-            if ($request->filled('password')) {
-                $usuario->Password = Hash::make($request->password);
-            }
-
-            $usuario->save();
-
-            return redirect()->back()->with('success', 'Usuario actualizado correctamente.');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error al actualizar el usuario.');
+        // Solo actualiza la contraseña si se proporciona una nueva
+        if ($request->filled('password')) {
+            $usuario->Password = Hash::make($request->password);
         }
+
+        $usuario->save();
+
+        return redirect()->route('admin.usuarios')->with('success', 'Usuario actualizado correctamente.');
     }
 
     public function destroy($id)

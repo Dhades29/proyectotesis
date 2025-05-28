@@ -3,15 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Materia;
 
-class Formularios extends Model
+class Ciclos extends Model
 {
     // Nombre de la tabla
-    protected $table = 'formularios';
+    protected $table = 'ciclos';
 
     // Clave primaria personalizada
-    protected $primaryKey = 'IdFormulario';
+    protected $primaryKey = 'IdCiclo';
 
     // Laravel asume que la clave primaria es auto-incremental y de tipo int
     public $incrementing = true;
@@ -22,8 +21,7 @@ class Formularios extends Model
 
     // Campos asignables en masa
     protected $fillable = [
-        'NombreFormulario',
-        'Descripcion',
-        'FechaCreacion',
+        'Anio',
+        'Periodo',
     ];
 }

@@ -14,13 +14,14 @@ Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 //Usuarios
 Route::get('/usuarios', [UsuariosController::class, 'usuarios'])->name('admin.usuarios');
 Route::post('usuarios/guardar', [UsuariosController::class, 'guardar'])->name('usuarios.guardar');
-Route::put('/usuarios/editar/{id}', [UsuariosController::class, 'editar'])->name('usuarios.editar');
+Route::put('/usuarios/{id}', [UsuariosController::class, 'editar'])->name('usuarios.editar');
 Route::delete('usuarios/{id}', [UsuariosController::class, 'destroy'])->name('usuarios.destroy');
 
 //Formularios
 Route::get('/formularios', [FormulariosController::class, 'index'])->name('formularios.index');
 Route::post('/formularios', [FormulariosController::class, 'store'])->name('formularios.store');
-Route::put('/formularios/{id}', [FormulariosController::class, 'update'])->name('formularios.update');
+Route::get('/formularios/{id}/detalles', [App\Http\Controllers\FormulariosController::class, 'detalles'])->name('formularios.detalles');
+Route::put('/formularios/{id}/preguntas/{idPregunta}/editar', [FormulariosController::class, 'actualizarPregunta'])->name('preguntas.actualizar');
 Route::delete('/formularios/{id}', [FormulariosController::class, 'destroy'])->name('formularios.destroy');
 
 

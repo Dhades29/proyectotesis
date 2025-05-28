@@ -3,15 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Materia;
 
-class Formularios extends Model
+class Preguntas extends Model
 {
     // Nombre de la tabla
-    protected $table = 'formularios';
+    protected $table = 'preguntas';
 
     // Clave primaria personalizada
-    protected $primaryKey = 'IdFormulario';
+    protected $primaryKey = 'IdPregunta';
 
     // Laravel asume que la clave primaria es auto-incremental y de tipo int
     public $incrementing = true;
@@ -22,8 +21,16 @@ class Formularios extends Model
 
     // Campos asignables en masa
     protected $fillable = [
-        'NombreFormulario',
-        'Descripcion',
-        'FechaCreacion',
+        'IdSeccion',
+        'Texto',
+        'TipoRespuesta',
+        'Orden',
+        'EsObligatoria',
     ];
+
+    // Relación: una pregunta pertenece a una sección
+    public function secciones()
+    {
+        return $this->belongsTo(Secciones::class, 'IdSeccion', 'IdSeccion');
+    }
 }

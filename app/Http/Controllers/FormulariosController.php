@@ -2,8 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Formularios;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use App\Models\Formularios;
+use App\Models\Secciones;
+use App\Models\Preguntas;
+use App\Models\Opciones;
+
 class FormulariosController extends Controller
 {
     public function index()
@@ -12,37 +18,148 @@ class FormulariosController extends Controller
         return view('admin.aForms', compact('formularios'));
     }
 
-    // Guardar un nuevo formulario
     public function store(Request $request)
     {
         $request->validate([
-            'nombreFormulario' => 'required|string|max:100',
-            // Si agregas más campos, agrégalos aquí
+            'nombre' => 'required|string|max:255',
+            'secciones' => 'required|array|min:1',
+            'secciones.*.titulo' => 'required|string|max:255',
+            'secciones.*.preguntas' => 'required|array|min:1',
+            'secciones.*.preguntas.*.texto' => 'required|string|max:1000',
+            'secciones.*.preguntas.*.tipo' => 'required|string|in:texto,seleccion,multiple,booleano',
+            // Opciones se validan en el ciclo
         ]);
 
-        // Mapear el nombre del input al campo del modelo
-        Formularios::create([
-            'NombreFormulario' => $request->input('nombreFormulario'),
-            // Si agregas más campos, agrégalos aquí
-        ]);
+        DB::beginTransaction();
+        try {
+            // 1. Crear el formulario
+            $formulario = Formularios::create([
+                'NombreFormulario' => $request->input('nombre'),
+                'Descripcion' => '', // Puedes agregar campo de descripción si lo deseas
+                'FechaCreacion' => Carbon::now(),
+            ]);
 
-        return redirect()->route('formularios.index')->with('success', 'Formulario creado correctamente.');
+            // 2. Recorrer secciones
+            $ordenSeccion = 1;
+            foreach ($request->input('secciones') as $seccionData) {
+                $seccion = Secciones::create([
+                    'IdFormulario' => $formulario->IdFormulario,
+                    'Titulo' => $seccionData['titulo'],
+                    'Orden' => $ordenSeccion++,
+                ]);
+
+                // 3. Recorrer preguntas de la sección
+                $ordenPregunta = 1;
+                foreach ($seccionData['preguntas'] as $preguntaData) {
+                    $esObligatoria = isset($preguntaData['es_obligatoria']) && $preguntaData['es_obligatoria'] == '1' ? 1 : 0;
+
+                    $pregunta = Preguntas::create([
+                        'IdSeccion' => $seccion->IdSeccion,
+                        'Texto' => $preguntaData['texto'],
+                        'TipoRespuesta' => $preguntaData['tipo'],
+                        'Orden' => $ordenPregunta++,
+                        'EsObligatoria' => $esObligatoria,
+                    ]);
+
+                    // 4. Si la pregunta tiene opciones (selección única o múltiple)
+                    if (
+                        in_array($preguntaData['tipo'], ['seleccion', 'multiple']) &&
+                        isset($preguntaData['opciones']) &&
+                        is_array($preguntaData['opciones'])
+                    ) {
+                        $ordenOpcion = 1;
+                        foreach ($preguntaData['opciones'] as $opcionTexto) {
+                            Opciones::create([
+                                'IdPregunta' => $pregunta->IdPregunta,
+                                'Texto' => $opcionTexto,
+                                'Orden' => $ordenOpcion++,
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('admin.usuarios')->with('success', 'Formulario creado correctamente.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withInput()->with('error', 'Error al guardar el formulario: ' . $e->getMessage());
+        }
     }
 
-    // Actualizar un formulario existente
-    public function update(Request $request, $id)
+    public function detalles($id)
+    {
+        $formulario = \App\Models\Formularios::findOrFail($id);
+
+        // Cargar secciones, preguntas y opciones
+        $secciones = \App\Models\Secciones::where('IdFormulario', $id)
+            ->orderBy('Orden')
+            ->get()
+            ->map(function($seccion) {
+                $seccion->preguntas = \App\Models\Preguntas::where('IdSeccion', $seccion->IdSeccion)
+                    ->orderBy('Orden')
+                    ->get()
+                    ->map(function($pregunta) {
+                        $pregunta->opciones = \App\Models\Opciones::where('IdPregunta', $pregunta->IdPregunta)
+                            ->orderBy('Orden')
+                            ->get();
+                        return $pregunta;
+                    });
+                return $seccion;
+            });
+
+        return view('admin.partials.detalles_formulario', compact('formulario', 'secciones'));
+    }
+    
+    public function actualizarPregunta(Request $request, $idFormulario, $idPregunta)
     {
         $request->validate([
-            'nombreFormulario' => 'required|string|max:100',
-            // Si agregas más campos, agrégalos aquí
+            'texto' => 'required|string|max:1000',
+            'tipo' => 'required|string|in:texto,seleccion,multiple,booleano',
+            'es_obligatoria' => 'nullable|boolean',
+            'opciones' => 'array',
+            'opciones.*' => 'string|max:255',
         ]);
 
-        $formulario = Formularios::findOrFail($id);
-        $formulario->NombreFormulario = $request->input('nombreFormulario');
-        // Si agregas más campos, agrégalos aquí
-        $formulario->save();
+        DB::beginTransaction();
+        try {
+            $pregunta = \App\Models\Preguntas::findOrFail($idPregunta);
 
-        return redirect()->route('formularios.index')->with('success', 'Formulario actualizado correctamente.');
+            $pregunta->Texto = $request->input('texto');
+            $pregunta->TipoRespuesta = $request->input('tipo');
+            $pregunta->EsObligatoria = $request->input('es_obligatoria', 0);
+            $pregunta->save();
+
+            // Solo sincroniza opciones si el tipo es seleccion o multiple
+            if (in_array($pregunta->TipoRespuesta, ['seleccion', 'multiple'])) {
+                $nuevasOpciones = $request->input('opciones', []);
+
+                // Elimina opciones que ya no están
+                \App\Models\Opciones::where('IdPregunta', $pregunta->IdPregunta)
+                    ->whereNotIn('Texto', $nuevasOpciones)
+                    ->delete();
+
+                // Actualiza o crea opciones
+                $orden = 1;
+                foreach ($nuevasOpciones as $textoOpcion) {
+                    $opcion = \App\Models\Opciones::firstOrNew([
+                        'IdPregunta' => $pregunta->IdPregunta,
+                        'Texto' => $textoOpcion,
+                    ]);
+                    $opcion->Orden = $orden++;
+                    $opcion->save();
+                }
+            } else {
+                // Si el tipo ya no es seleccion/multiple, elimina todas las opciones
+                \App\Models\Opciones::where('IdPregunta', $pregunta->IdPregunta)->delete();
+            }
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Pregunta actualizada correctamente.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Error al actualizar: ' . $e->getMessage()], 500);
+        }
     }
 
     // Eliminar un formulario

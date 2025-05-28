@@ -170,6 +170,15 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Actualizar Usuario</button>
                     </div>
+                    @if ($errors->any())
+                        <div class="alert alert-danger mt-2">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                 </div>
             </form>
         </div>
@@ -177,20 +186,28 @@
     
     <script>
         function cargarDatosUsuario(button) {
+            // Obtener los atributos del botón
             const id = button.getAttribute('data-id');
             const nombre = button.getAttribute('data-nombre');
             const apellido = button.getAttribute('data-apellido');
             const username = button.getAttribute('data-username');
             const rol = button.getAttribute('data-rol');
 
-            document.getElementById('edit-id').value = id;
+            // Asignar los valores al formulario del modal
+            document.getElementById('edit-id').value = id; // opcional, solo para mostrar o mantener en el frontend
             document.getElementById('edit-nombre').value = nombre;
             document.getElementById('edit-apellido').value = apellido;
             document.getElementById('edit-username').value = username;
             document.getElementById('edit-rol').value = rol;
 
+            // Actualizar la acción del formulario para que incluya el ID
             const form = document.getElementById('formEditarUsuario');
-            form.action = `/usuarios/editar/${id}`;
+            form.action = `/usuarios/${id}`;
+
+            // Mostrar el modal si estás usando Bootstrap (opcional)
+            const modal = new bootstrap.Modal(document.getElementById('modalEditarUsuario'));
+            modal.show();
         }
+
     </script>
 @endsection
