@@ -162,6 +162,10 @@
         <div class="dropdown-container">
             <a href="{{ route('admin.usuarios') }}"><i class="fa-solid fa-users"></i> Gestión de Usuarios</a>
             <a href="{{ route('admin.materias') }}"><i class="fa-solid fa-book"></i> Gestión de Materias</a>
+            <a href="{{ route('catedras.index') }}"><i class="fa-solid fa-chalkboard-teacher"></i> Gestión de Catedras</a>
+            <a href=""><i class="fa-solid fa-calendar-alt"></i> Gestión de Ciclos</a>
+            <a href=""><i class="fa-solid fa-door-open"></i> Gestión de Clases</a>
+            <a href=""><i class="fa-solid fa-user-tie"></i> Gestión de Docentes</a>
         </div>
 
         <button class="dropdown-btn">
@@ -189,7 +193,8 @@
         @yield('content')
 
     </div>
-
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const sidebar = document.getElementById('sidebar');

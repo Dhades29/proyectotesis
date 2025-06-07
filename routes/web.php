@@ -5,6 +5,14 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\FormulariosController;
+use App\Http\Controllers\CatedrasController;
+
+// Cátedras CRUD
+Route::get('/catedras', [CatedrasController::class, 'index'])->name('catedras.index');
+Route::post('/catedras', [CatedrasController::class, 'store'])->name('catedras.store');
+Route::get('/catedras/{IdCatedra}/edit', [CatedrasController::class, 'edit'])->name('catedras.edit');
+Route::put('/catedras/{IdCatedra}', [CatedrasController::class, 'update'])->name('catedras.update');
+Route::delete('/catedras/{IdCatedra}', [CatedrasController::class, 'destroy'])->name('catedras.destroy');
 
 //Login
 Route::get('/', [LoginController::class, 'showLogin'])->name('login');
@@ -20,10 +28,17 @@ Route::delete('usuarios/{id}', [UsuariosController::class, 'destroy'])->name('us
 //Formularios
 Route::get('/formularios', [FormulariosController::class, 'index'])->name('formularios.index');
 Route::post('/formularios', [FormulariosController::class, 'store'])->name('formularios.store');
-Route::get('/formularios/{id}/detalles', [App\Http\Controllers\FormulariosController::class, 'detalles'])->name('formularios.detalles');
-Route::put('/formularios/{id}/preguntas/{idPregunta}/editar', [FormulariosController::class, 'actualizarPregunta'])->name('preguntas.actualizar');
+Route::get('/formularios/{id}/detalles', [FormulariosController::class, 'detalles'])->name('formularios.detalles');
 Route::delete('/formularios/{id}', [FormulariosController::class, 'destroy'])->name('formularios.destroy');
 
+Route::get('/admin/formularios/{id}/editar-parcial', [App\Http\Controllers\FormulariosController::class, 'editarParcial']);
+Route::put('/formularios/{id}', [FormulariosController::class, 'update'])->name('formularios.update');
+
+
+
+Route::get('/home', function () {
+    return view('home');
+})->name('home');
 
 Route::get('dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 

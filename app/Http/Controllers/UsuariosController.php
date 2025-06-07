@@ -42,7 +42,7 @@ class UsuariosController extends Controller
                 'Nombre' => $request->nombre,
                 'Apellido' => $request->apellido,
                 'NombreUsuario' => $request->username,
-                'Password' => Hash::make($request->password),
+                'Password' => $request->password,
                 'IdRol' => $rolMap[$request->rol]
             ]);
     
@@ -73,7 +73,7 @@ class UsuariosController extends Controller
 
         // Solo actualiza la contraseña si se proporciona una nueva
         if ($request->filled('password')) {
-            $usuario->Password = Hash::make($request->password);
+            $usuario->Password = $request->password;
         }
 
         $usuario->save();

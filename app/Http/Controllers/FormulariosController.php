@@ -170,4 +170,90 @@ class FormulariosController extends Controller
 
         return redirect()->route('formularios.index')->with('success', 'Formulario eliminado correctamente.');
     }
+
+
+    // Mostrar la vista de edición
+    public function editarParcial($id)
+    {
+        // 1. Obtener el formulario
+        $formulario = Formularios::findOrFail($id);
+
+        // 2. Obtener las secciones del formulario
+        $secciones = Secciones::where('IdFormulario', $formulario->IdFormulario)
+            ->orderBy('Orden')
+            ->get();
+
+        // 3. Para cada sección, obtener sus preguntas y para cada pregunta, sus opciones
+        foreach ($secciones as $seccion) {
+            $preguntas = Preguntas::where('IdSeccion', $seccion->IdSeccion)
+                ->orderBy('Orden')
+                ->get();
+
+            foreach ($preguntas as $pregunta) {
+                $opciones = Opciones::where('IdPregunta', $pregunta->IdPregunta)
+                    ->orderBy('Orden')
+                    ->get();
+                $pregunta->opciones = $opciones;
+            }
+            $seccion->preguntas = $preguntas;
+        }
+
+        // 4. Pasar $formulario y $secciones a la vista parcial
+        return view('admin.partials.formulario_edicion', compact('formulario', 'secciones'));
+    }
+
+     // Guardar cambios de edición
+    public function update(Request $request, $id)
+    {
+        DB::transaction(function () use ($request, $id) {
+            $formulario = Formularios::findOrFail($id);
+            $formulario->NombreFormulario = $request->input('nombre');
+            $formulario->save();
+
+            // Eliminar secciones, preguntas y opciones existentes
+            $secciones = Secciones::where('IdFormulario', $id)->get();
+            foreach ($secciones as $seccion) {
+                $preguntas = DB::table('preguntas')->where('IdSeccion', $seccion->IdSeccion)->get();
+                foreach ($preguntas as $pregunta) {
+                    DB::table('opciones')->where('IdPregunta', $pregunta->IdPregunta)->delete();
+                }
+                DB::table('preguntas')->where('IdSeccion', $seccion->IdSeccion)->delete();
+            }
+            Secciones::where('IdFormulario', $id)->delete();
+
+            // Crear nuevas secciones, preguntas y opciones
+            $ordenSeccion = 1;
+            foreach ($request->input('secciones', []) as $seccionData) {
+                $seccion = Secciones::create([
+                    'IdFormulario' => $id,
+                    'Titulo' => $seccionData['titulo'] ?? '',
+                    'Orden' => $ordenSeccion++,
+                ]);
+                if (!empty($seccionData['preguntas'])) {
+                    foreach ($seccionData['preguntas'] as $preguntaData) {
+                        $preguntaId = DB::table('preguntas')->insertGetId([
+                            'IdSeccion' => $seccion->IdSeccion,
+                            'Texto' => $preguntaData['texto'] ?? '',
+                            'TipoRespuesta' => $preguntaData['tipo'] ?? 'texto',
+                            'EsObligatoria' => isset($preguntaData['es_obligatoria']) ? 1 : 0,
+                        ]);
+                        if (in_array($preguntaData['tipo'] ?? '', ['seleccion', 'multiple'])) {
+                            if (!empty($preguntaData['opciones'])) {
+                                foreach ($preguntaData['opciones'] as $opcionTexto) {
+                                    DB::table('opciones')->insert([
+                                        'IdPregunta' => $preguntaId,
+                                        'Texto' => $opcionTexto,
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        return redirect()->route('formularios.edit', $id)->with('success', 'Formulario actualizado correctamente');
+    }
+
+
 }

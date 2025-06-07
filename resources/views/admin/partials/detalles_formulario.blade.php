@@ -1,7 +1,10 @@
 <div class="card">
-    <div class="card-header bg-info text-white">
-        <strong>{{ $formulario->NombreFormulario }}</strong>
-    </div>
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+    <strong>{{ $formulario->NombreFormulario }}</strong>
+    <button type="button" class="btn btn-sm btn-light text-danger" onclick="cerrarDetallesFormulario()">
+        <i class="fa fa-times"></i>
+    </button>
+</div>
     <div class="card-body">
         @foreach($secciones as $seccion)
             <div class="mb-3">
