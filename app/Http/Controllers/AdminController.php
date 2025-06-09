@@ -11,20 +11,6 @@ class AdminController extends Controller
         return view('admin.dashboard');
     }
 
-    public function materias(){
-        return view('admin.materias');
-    }
-
-    public function aForms(){
-        //mostrar vista de asignacion de formularios
-        return view('admin.aForms');
-    }
-
-    public function cForms(){
-        //vista de creacion de formularios
-        return view('admin.cForms');
-    }
-
     public function reportes(){
         return view('admin.reportes');
     }

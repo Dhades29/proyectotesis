@@ -38,7 +38,7 @@ class Clases extends Model
 
     public function materias()
     {
-        return $this->belongsTo(Materia::class, 'IdMateria', 'IdMateria');
+        return $this->belongsTo(Materias::class, 'IdMateria', 'IdMateria');
     }
 
     public function docentes()

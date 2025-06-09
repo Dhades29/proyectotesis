@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Materia extends Model
+class Materias extends Model
 {
     protected $table = 'Materia';
 
@@ -19,9 +19,5 @@ class Materia extends Model
         'Modalidad'
     ];
 
-    // Relación con Formularios (uno a muchos)
-    public function formularios()
-    {
-        return $this->hasMany(Formularios::class, 'IdMateria', 'IdMateria');
-    }
+    
 }

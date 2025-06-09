@@ -161,11 +161,11 @@
         </button>
         <div class="dropdown-container">
             <a href="{{ route('admin.usuarios') }}"><i class="fa-solid fa-users"></i> Gestión de Usuarios</a>
-            <a href="{{ route('admin.materias') }}"><i class="fa-solid fa-book"></i> Gestión de Materias</a>
+            <a href="{{ route('materias') }}"><i class="fa-solid fa-book"></i> Gestión de Materias</a>
             <a href="{{ route('catedras.index') }}"><i class="fa-solid fa-chalkboard-teacher"></i> Gestión de Catedras</a>
-            <a href=""><i class="fa-solid fa-calendar-alt"></i> Gestión de Ciclos</a>
-            <a href=""><i class="fa-solid fa-door-open"></i> Gestión de Clases</a>
-            <a href=""><i class="fa-solid fa-user-tie"></i> Gestión de Docentes</a>
+            <a href="{{ route('ciclos.index') }}"><i class="fa-solid fa-calendar-alt"></i> Gestión de Ciclos</a>
+            <a href="{{ route('clases.index') }}"><i class="fa-solid fa-door-open"></i> Gestión de Clases</a>
+            <a href="{{ route('docentes.index') }}"><i class="fa-solid fa-user-tie"></i> Gestión de Docentes</a>
         </div>
 
         <button class="dropdown-btn">
@@ -174,7 +174,7 @@
         </button>
         <div class="dropdown-container">
             <a href="{{ route('formularios.index') }}"><i class="fa-solid fa-plus"></i> Crear formulario</a>
-            <a href=""><i class="fa-solid fa-user-check"></i> Asignar formulario</a>
+            <a href="{{ route('asignarForm.index') }}"><i class="fa-solid fa-user-check"></i> Asignar formulario</a>
             <a href="{{ route('admin.respuestas') }}"><i class="fa-solid fa-reply"></i> Respuestas</a>
         </div>
 
