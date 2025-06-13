@@ -31,4 +31,8 @@ class Secciones extends Model
     {
         return $this->belongsTo(Formularios::class, 'IdFormulario', 'IdFormulario');
     }
+    public function preguntas()
+    {
+        return $this->hasMany(Preguntas::class, 'IdSeccion', 'IdSeccion');
+    }
 }

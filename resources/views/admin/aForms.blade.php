@@ -1,6 +1,6 @@
 @extends('layouts.menu')
 
-@section('title', 'Asignar Formularios')
+@section('title', 'Crear Formularios')
 
 @section('content')
 <div class="container-fluid">
@@ -253,17 +253,22 @@
         const indexOpcion = contenedor.childElementCount;
 
         const opcionHTML = `
-            <div class="input-group">
-                <div class="input-group-text">
+            <div class="d-flex align-items-center mb-2 opcion-item">
+                <div class="input-group-text me-2">
                     <input type="${tipoInput}" disabled>
                 </div>
-                <input type="text" name="secciones[${seccionId}][preguntas][${preguntaId}][opciones][${indexOpcion}]" class="form-control" required>
-                <button class="btn btn-outline-danger" type="button" onclick="this.closest('.input-group').remove()">
+                <input type="text" name="secciones[${seccionId}][preguntas][${preguntaId}][opciones][${indexOpcion}]" class="form-control me-2" required>
+                <button type="button" class="btn btn-danger btn-sm" onclick="eliminarOpcion(this)">
                     <i class="fa fa-trash"></i>
                 </button>
             </div>
         `;
+
         contenedor.insertAdjacentHTML('beforeend', opcionHTML);
+    }
+
+    function eliminarOpcion(button) {
+        button.parentElement.remove();
     }
 
     function limpiarModalFormulario() {
@@ -317,21 +322,21 @@
     }
 
 
-// Alerta visual para superposición
-function mostrarAlertaSuperposicion(mensaje) {
-    let alerta = document.getElementById('alerta-superposicion');
-    if (!alerta) {
-        alerta = document.createElement('div');
-        alerta.id = 'alerta-superposicion';
-        alerta.className = 'alert alert-warning position-fixed top-0 start-50 translate-middle-x mt-3';
-        alerta.style.zIndex = 20000;
-        alerta.style.minWidth = '300px';
-        document.body.appendChild(alerta);
+    // Alerta visual para superposición
+    function mostrarAlertaSuperposicion(mensaje) {
+        let alerta = document.getElementById('alerta-superposicion');
+        if (!alerta) {
+            alerta = document.createElement('div');
+            alerta.id = 'alerta-superposicion';
+            alerta.className = 'alert alert-warning position-fixed top-0 start-50 translate-middle-x mt-3';
+            alerta.style.zIndex = 20000;
+            alerta.style.minWidth = '300px';
+            document.body.appendChild(alerta);
+        }
+        alerta.innerText = mensaje;
+        alerta.style.display = 'block';
+        setTimeout(() => { alerta.style.display = 'none'; }, 2500);
     }
-    alerta.innerText = mensaje;
-    alerta.style.display = 'block';
-    setTimeout(() => { alerta.style.display = 'none'; }, 2500);
-}
 </script>
 
 @endsection

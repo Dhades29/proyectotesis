@@ -30,7 +30,7 @@ class Asignaciones extends Model
 
     // Relaciones Eloquent
 
-    public function formularios()
+    public function formulario()
     {
         return $this->belongsTo(Formularios::class, 'IdFormulario', 'IdFormulario');
     }
@@ -43,5 +43,9 @@ class Asignaciones extends Model
     public function usuarios()
     {
         return $this->belongsTo(Usuarios::class, 'IdUsuario', 'IdUsuario');
+    }
+    public function respuestas()
+    {
+        return $this->hasMany(Respuestas::class, 'IdAsignacion', 'IdAsignacion');
     }
 }

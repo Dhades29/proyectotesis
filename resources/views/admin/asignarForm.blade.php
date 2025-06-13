@@ -1,134 +1,93 @@
 @extends('layouts.menu')
 
-@section('title', 'asignarForm')
+@section('title', 'Asignar Formulario')
 
 @section('content')
-    <div class="container">
+<div class="container">
+    <h2 class="mb-4">Asignar Formularios a Usuarios</h2>
 
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-            </div>
-        @endif
-
-        @if (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-            </div>
-        @endif
-
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2>Asignar Formulario</h2>
-            <!-- Botón para abrir modal -->
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAgregarUsuario">
-                <i class="fa fa-plus"></i> Asignar Formulario
-            </button>
-        </div>
-        
-        <!-- Tabla de usuarios -->
-        <div class="table-responsive">
-            <table class="table table-striped align-middle">
-                <thead class="table-dark">
+    <!-- Tabla de usuarios -->
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>NombreUsuario</th>
+                    <th>Rol</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($usuarios as $usuario)
                     <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th>Apellido</th>
-                        <th>NombreUsuario</th>
-                        <th>Rol</th>
-                        <th>Acciones</th>
+                        <td>{{ $usuario->IdUsuario }}</td>
+                        <td>{{ $usuario->Nombre }}</td>
+                        <td>{{ $usuario->Apellido }}</td>
+                        <td>{{ $usuario->NombreUsuario }}</td>
+                        <td>Observador</td>
+                        <td>
+                            <!-- Botón para abrir modal dinámico -->
+                            <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modalAsignarFormulario{{ $usuario->IdUsuario }}">
+                                <i class="fa fa-plus"></i> Asignar
+                            </button>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach ($usuarios as $usuario)
-                        <tr>
-                            <td>{{ $usuario->IdUsuario }}</td>
-                            <td>{{ $usuario->Nombre }}</td>
-                            <td>{{ $usuario->Apellido }}</td>
-                            <td>{{ $usuario->NombreUsuario }}</td>
-                            <td>Observador</td>
-                            <td>
-                                <!-- Botón asignar -->
-                                <a href="#" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modalAsignarFormulario">
-                                    <i class="fa fa-plus"></i>
-                                </a>
 
-                               
-                                <!-- Botón eliminar -->
-                                <form action="" method="POST" style="display:inline-block;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" title="Editar">
-                                        <i class="fa fa-edit"></i>
-                                    </button>
-                                </form>
+                    <!-- Modal para asignar formularios a este usuario -->
+                    <div class="modal fade" id="modalAsignarFormulario{{ $usuario->IdUsuario }}" tabindex="-1" aria-labelledby="modalLabel{{ $usuario->IdUsuario }}" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <form action="{{ route('asignaciones.store') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="IdUsuario" value="{{ $usuario->IdUsuario }}">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modalLabel{{ $usuario->IdUsuario }}">Asignar Formularios a {{ $usuario->Nombre }} {{ $usuario->Apellido }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label for="IdFormulario" class="form-label">Seleccionar Formulario(s)</label>
+                                            <select name="IdFormulario[]" class="form-select" multiple required>
+                                                @foreach ($formularios as $formulario)
+                                                    <option value="{{ $formulario->IdFormulario }}">{{ $formulario->NombreFormulario }}</option>
+                                                @endforeach
+                                            </select>
+                                            <small class="text-muted">Puedes seleccionar uno o varios formularios.</small>
+                                        </div>
 
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+                                       <div class="mb-3">
+                                            <label for="IdClase" class="form-label">Seleccionar Clase</label>
+                                            <select name="IdClase" class="form-select" required>
+                                                <option value="">Seleccione una clase</option>
+                                                @foreach ($clases as $clase)
+                                                    <option value="{{ $clase->IdClase }}">
+                                                        {{ $clase->materias->Nombre }} - {{ $clase->DiaSemana }} {{ $clase->HoraInicio }} - Aula: {{ $clase->Aula }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="FechaAsignacion" class="form-label">Fecha de Asignación</label>
+                                            <input type="date" name="FechaAsignacion" class="form-control" value="{{ date('Y-m-d') }}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" class="btn btn-primary">Guardar Asignación</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                @endforeach
+            </tbody>
+        </table>
     </div>
-
-    <!-- Modal para agregar asignaciones -->
-    <div class="modal fade" id="modalAsignarFormulario" tabindex="-1" aria-labelledby="modalAsignarFormularioLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg"> {{-- Se amplía el tamaño del modal --}}
-            <form action="{{ route('usuarios.guardar') }}" method="POST">
-                @csrf
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalAsignarFormularioLabel">Asignar Formularios</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                        {{-- Tabla de formularios disponibles (registros quemados) --}}
-                        <table class="table table-bordered table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th scope="col"><input type="checkbox" id="checkAll"></th>
-                                    <th scope="col">Nombre del Formulario</th>
-                                    <th scope="col">Fecha de Creación</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><input type="checkbox" name="formularios[]" value="1"></td>
-                                    <td>Encuesta de Satisfacción</td>
-                                    <td>2024-06-01</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox" name="formularios[]" value="2"></td>
-                                    <td>Formulario de Registro</td>
-                                    <td>2024-06-03</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox" name="formularios[]" value="3"></td>
-                                    <td>Evaluación Docente</td>
-                                    <td>2024-06-04</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox" name="formularios[]" value="4"></td>
-                                    <td>Solicitud de Servicios</td>
-                                    <td>2024-06-05</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox" name="formularios[]" value="5"></td>
-                                    <td>Formulario de Contacto</td>
-                                    <td>2024-06-06</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Guardar</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
+</div>
 
     <script>
         function cargarDatosUsuario(button) {
@@ -150,11 +109,12 @@
 
         //seleccionar forms
         document.addEventListener("DOMContentLoaded", function () {
-        const checkAll = document.getElementById("checkAll");
-        const checkboxes = document.querySelectorAll('input[name="formularios[]"]');
+            const checkAll = document.getElementById("checkAll");
+            const checkboxes = document.querySelectorAll('input[name="formularios[]"]');
 
-        checkAll.addEventListener("change", function () {
-            checkboxes.forEach(cb => cb.checked = checkAll.checked);
+            checkAll.addEventListener("change", function () {
+                checkboxes.forEach(cb => cb.checked = checkAll.checked);
+            });
         });
 
     </script>

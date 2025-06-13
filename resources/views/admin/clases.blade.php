@@ -51,7 +51,7 @@
                         <td>{{ $clase->materias->Nombre ?? 'Sin asignar' }}</td>
                         <td>{{ $clase->docentes->Nombre ?? 'Sin asignar' }}</td>
                         <td>{{ $clase->ciclos->Anio ?? '' }} - {{ $clase->ciclos->Periodo ?? '' }}</td>
-                        <td>{{ $clase->catedras->Nombre ?? 'Sin asignar' }}</td>
+                        <td>{{ $clase->catedras->NombreCatedra ?? 'Sin asignar' }}</td>
                         <td>{{ $clase->Seccion }}</td>
                         <td>{{ $clase->Aula }}</td>
                         <td>{{ $clase->Edificio }}</td>
@@ -138,7 +138,7 @@
                     { id: 'IdMateria', nombre: 'Materia' },
                     { id: 'IdDocente', nombre: 'Docente' },
                     { id: 'IdCiclo', nombre: 'Ciclo' },
-                    { id: 'IdCatedra', nombre: 'Cátedra' },
+                    { id: 'IdCatedra', nombre: 'Catedra' },
                     { id: 'Seccion', nombre: 'Sección' },
                     { id: 'Aula', nombre: 'Aula' },
                     { id: 'Edificio', nombre: 'Edificio' },

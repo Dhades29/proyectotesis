@@ -33,4 +33,8 @@ class Preguntas extends Model
     {
         return $this->belongsTo(Secciones::class, 'IdSeccion', 'IdSeccion');
     }
+    public function opciones()
+    {
+        return $this->hasMany(Opciones::class, 'IdPregunta', 'IdPregunta');
+    }
 }

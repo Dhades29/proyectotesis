@@ -19,7 +19,7 @@ class Usuarios extends Model
         'NombreUsuario',
         'Password',
         'IdRol'
-    ];
+    ];  
 
     // Relación con la tabla de roles (si existe)
     public function rol()

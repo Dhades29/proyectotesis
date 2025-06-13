@@ -35,8 +35,8 @@ class LoginController extends Controller
         if ($usuario && $usuario->Password === $request->password) {
             // Guardar en sesión
             session([
-                'idusuario' => $usuario->IdUsuario,
-                'nombre' => $usuario->Nombre,
+                'IdUsuario' => $usuario->IdUsuario,
+                'Nombre' => $usuario->Nombre,
                 'rol' => $usuario->IdRol
             ]);
 

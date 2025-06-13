@@ -11,9 +11,20 @@ use App\Http\Controllers\ClasesController;
 use App\Http\Controllers\CiclosController;
 use App\Http\Controllers\MateriasController;
 use App\Http\Controllers\AsignarFormController;
+use App\Http\Controllers\RespuestasController;
 
-//Asignar formularios crud
+//Respuestas de los usuarios a los forms
+// Mostrar los formularios asignados al observador
+Route::get('/observador/inicio', [RespuestasController::class, 'index'])->name('observador.inicio');
+Route::get('/observador/formularios/{asignacionId}/responder', [RespuestasController::class, 'mostrarFormulario'])->name('observador.responder');
+Route::post('/observador/formularios/{asignacionId}/responder', [RespuestasController::class, 'guardarRespuestas'])->name('observador.guardarRespuestas');
+
+
+
+//Asignar formularios a un usuario
 Route::get('/asignar-form', [AsignarFormController::class, 'index'])->name('asignarForm.index');
+Route::post('/asignaciones/store', [AsignarFormController::class, 'store'])->name('asignaciones.store');
+
 
 //materias crud
 Route::get('/materias', [MateriasController::class, 'index'])->name('materias');
@@ -96,6 +107,3 @@ Route::get('respuestas', [AdminController::class, 'respuestas'])->name('admin.re
 
 Route::get('reportes', [AdminController::class, 'reportes'])->name('admin.reportes');
 
-Route::get('observador/inicio', function () {
-    return view('observador.inicio');
-})->name('observador.inicio');
